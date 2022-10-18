@@ -34,7 +34,7 @@ void AsyncOSC::parsePacket(AsyncUDPPacket _packet) {
 //     protocol = P_DDP;
 //   }
 
-  if (!error) {
+  if (!error && (_callback != nullptr) ) {
     _callback( inmsg );
   }
 }

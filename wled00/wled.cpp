@@ -523,6 +523,13 @@ void WLED::initAP(bool resetAP)
     e131.begin(false, e131Port, e131Universe, E131_MAX_UNIVERSE_COUNT);
     ddp.begin(false, DDP_DEFAULT_PORT);
 
+    // @CUSTOM BEGIN
+    DEBUG_PRINT("Listening for OSC on port ");
+    DEBUG_PRINT(OSC_DEFAULT_PORT);
+    DEBUG_PRINTLN();
+    osc.begin();
+    // @CUSTOM END
+
     dnsServer.setErrorReplyCode(DNSReplyCode::NoError);
     dnsServer.start(53, "*", WiFi.softAPIP());
   }
@@ -727,6 +734,14 @@ void WLED::initInterfaces()
   ddp.begin(false, DDP_DEFAULT_PORT);
   reconnectHue();
   initMqtt();
+  
+  // @CUSTOM BEGIN
+  DEBUG_PRINT("Listening for OSC on port ");
+  DEBUG_PRINT(OSC_DEFAULT_PORT);
+  DEBUG_PRINTLN();
+  osc.begin();
+  // @CUSTOM END
+
   interfacesInited = true;
   wasConnected = true;
 }

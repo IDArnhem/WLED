@@ -126,6 +126,7 @@
 #endif
 
 #include "src/dependencies/e131/ESPAsyncE131.h"
+#include "src/dependencies/AsyncOSC/AsyncOSC.h"
 #include "src/dependencies/async-mqtt-client/AsyncMqttClient.h"
 
 #define ARDUINOJSON_DECODE_UNICODE 0
@@ -619,6 +620,7 @@ WLED_GLOBAL WiFiUDP notifierUdp, rgbUdp, notifier2Udp;
 WLED_GLOBAL WiFiUDP ntpUdp;
 WLED_GLOBAL ESPAsyncE131 e131 _INIT_N(((handleE131Packet)));
 WLED_GLOBAL ESPAsyncE131 ddp  _INIT_N(((handleE131Packet)));
+WLED_GLOBAL AsyncOSC osc      _INIT_N(((handleOscMessage))); 
 WLED_GLOBAL bool e131NewData _INIT(false);
 
 // led fx library object

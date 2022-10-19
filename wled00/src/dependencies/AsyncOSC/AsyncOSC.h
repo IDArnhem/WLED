@@ -36,7 +36,7 @@ class AsyncOSC {
     osc_callback_function _callback = nullptr;
 
  public:
-    AsyncOSC(osc_callback_function callback);
+    AsyncOSC(osc_callback_function cb);
 
     // Generic UDP listener, no physical or IP configuration
     bool begin(uint16_t port = OSC_DEFAULT_PORT);

@@ -2,8 +2,8 @@
 #include "../network/Network.h"
 #include <string.h>
 
-AsyncOSC::AsyncOSC(osc_callback_function callback) {
-  _callback = callback;
+AsyncOSC::AsyncOSC(osc_callback_function cb) {
+  _callback = cb;
 }
 
 bool AsyncOSC::begin(uint16_t port) {
@@ -12,6 +12,8 @@ bool AsyncOSC::begin(uint16_t port) {
 
 bool AsyncOSC::initUnicast(uint16_t port) {
   bool success = false;
+
+  Serial.println("[OSC] unicast init");
 
   if (udp.listen(port)) {
     udp.onPacket(std::bind(&AsyncOSC::parsePacket, this, std::placeholders::_1));
@@ -25,6 +27,8 @@ void AsyncOSC::parsePacket(AsyncUDPPacket _packet) {
 
   OSCMessage inmsg;
 
+  Serial.println("[OSC] packet received");
+
   uint8_t *datap = _packet.data();
   inmsg.fill( datap, _packet.length() );
   error = inmsg.hasError();
@@ -34,7 +38,16 @@ void AsyncOSC::parsePacket(AsyncUDPPacket _packet) {
 //     protocol = P_DDP;
 //   }
 
-  if (!error && (_callback != nullptr) ) {
+  if( _callback == nullptr ) {
+    Serial.print("[OSC] callback not set ");
+  } else {
     _callback( inmsg );
   }
+
+  // if (!error && (_callback != nullptr) ) {
+  //   _callback( inmsg );
+  // } else {
+  //   Serial.print("[OSC] error ");
+  //   Serial.println( inmsg.getError() );
+  // }
 }

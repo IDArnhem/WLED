@@ -25,7 +25,7 @@ bool AsyncOSC::initUnicast(uint16_t port) {
 void AsyncOSC::parsePacket(AsyncUDPPacket _packet) {
   bool error = false;
 
-  OSCMessage inmsg;
+  OSCBundle inmsg;
 
   Serial.println("[OSC] packet received");
 

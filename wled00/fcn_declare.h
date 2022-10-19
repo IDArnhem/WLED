@@ -81,6 +81,10 @@ void handleDMX();
 //e131.cpp
 void handleE131Packet(e131_packet_t* p, IPAddress clientIP, byte protocol);
 
+//oschandler.cpp
+//void handleOscMessage(OSCMessage &msg);
+void handleOscMessage(OSCBundle &bndl);
+
 //file.cpp
 bool handleFileRead(AsyncWebServerRequest*, String path);
 bool writeObjectToFileUsingId(const char* file, uint16_t id, JsonDocument* content);

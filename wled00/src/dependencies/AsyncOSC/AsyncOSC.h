@@ -22,7 +22,7 @@
 #define OSC_DEFAULT_PORT   12345
 
 // new packet callback
-typedef void (*osc_callback_function) (OSCMessage &msg);
+typedef void (*osc_callback_function) (OSCBundle &msg);
 
 
 class AsyncOSC {

@@ -35,7 +35,9 @@ void AsyncOSC::parsePacket(AsyncUDPPacket _packet) {
 
   // parse single OSC message
   inmsg.fill( datap, _packet.length() );
-  if( inmsg.hasError() ) {
+  if( inmsg.getError() ) {
+    Serial.print("[OSC] parsing message error: ");
+    Serial.println(inmsg.getError());
     error = true;
 
     // failed to parse a single message
@@ -43,12 +45,13 @@ void AsyncOSC::parsePacket(AsyncUDPPacket _packet) {
     {
       // parse OSC bundle
       inbndl.fill( datap, _packet.length() );
-      if( !inbndl.hasError() ) {
+      if( !inbndl.getError() ) {
         // recover from previous error
         error = false;
         if( _cbBundle == nullptr ) {
           Serial.print("[OSC] bundle callback not set ");
         } else {
+          Serial.print("[OSC] calling bundle callback");
           _cbBundle( inbndl );
         }
       } // if no errors in bundle
@@ -58,6 +61,7 @@ void AsyncOSC::parsePacket(AsyncUDPPacket _packet) {
     if( _cbMessage == nullptr ) {
       Serial.print("[OSC] message callback not set ");
     } else {
+      Serial.print("[OSC] calling message callback");
       _cbMessage( inmsg );
     }
   }

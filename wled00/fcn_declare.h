@@ -83,7 +83,8 @@ void handleE131Packet(e131_packet_t* p, IPAddress clientIP, byte protocol);
 
 //oschandler.cpp
 //void handleOscMessage(OSCMessage &msg);
-void handleOscMessage(OSCBundle &bndl);
+void handleOscBundle(OSCBundle &bndl);
+void handleOscMessage(OSCMessage &bndl);
 
 //file.cpp
 bool handleFileRead(AsyncWebServerRequest*, String path);

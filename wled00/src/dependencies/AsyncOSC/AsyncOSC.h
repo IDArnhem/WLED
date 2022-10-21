@@ -22,7 +22,8 @@
 #define OSC_DEFAULT_PORT   12345
 
 // new packet callback
-typedef void (*osc_callback_function) (OSCBundle &msg);
+typedef void (*osc_bundle_callback_function) (OSCBundle &bndl);
+typedef void (*osc_message_callback_function) (OSCMessage &msg);
 
 
 class AsyncOSC {
@@ -33,10 +34,11 @@ class AsyncOSC {
     // packet parser callback
     void parsePacket(AsyncUDPPacket _packet);
     
-    osc_callback_function _callback = nullptr;
+    osc_bundle_callback_function _cbBundle = nullptr;
+    osc_message_callback_function _cbMessage = nullptr;
 
  public:
-    AsyncOSC(osc_callback_function cb);
+    AsyncOSC(osc_bundle_callback_function cbb, osc_message_callback_function cbm);
 
     // Generic UDP listener, no physical or IP configuration
     bool begin(uint16_t port = OSC_DEFAULT_PORT);

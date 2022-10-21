@@ -137,6 +137,12 @@ Host: <input type="text" name="BH" maxlength="32">
 Port: <input name="BP" type="number" min="1" max="65535" value="80" class="d5"><br>
 Device Auth token: <input name="BK" maxlength="33"><br>
 <i>Clear the token field to disable. </i><a href="https://kno.wled.ge/interfaces/blynk/" target="_blank">Setup info</a>
+<h3>Open Sound Control (OSC)</h3>
+Enable OSC: <input type="checkbox" name="OSCON"><br>
+Listen on port: <input name="OSCLISTENPORT" type="number" min="1" max="65535" class="d5"><br>
+Send heartbeat: <input type="checkbox" name="OSCHB"><br>
+Send to host: <input type="text" name="OSCHOST" maxlength="32"><br>
+Send to port: <input name="OSCDESTPORT" type="number" min="1" max="65535" class="d5"><br>
 <h3>MQTT</h3>
 Enable MQTT: <input type="checkbox" name="MQ"><br>
 Broker: <input type="text" name="MS" maxlength="32">

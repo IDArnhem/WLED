@@ -17,31 +17,50 @@
 #include "OSC/OSCMessage.h"
 #include "OSC/OSCBundle.h"
 
+#include <map>
+
 
 // defaults
 #define OSC_DEFAULT_PORT   12345
 
 // new packet callback
-typedef void (*osc_bundle_callback_function) (OSCBundle &bndl);
-typedef void (*osc_message_callback_function) (OSCMessage &msg);
+// typedef void (*osc_bundle_callback_function) (OSCBundle &bndl);
+// typedef void (*osc_message_callback_function) (OSCMessage &msg);
+
+
+typedef void (*callbackOSC_c)(OSCMessage &); // c-style callback
+typedef std::function<void(OSCMessage &)> callbackOSC;
+//using callbackOSC = std::function<void(OSCMessage &)>; // c++ style callback
 
 
 class AsyncOSC {
  private:
-    AsyncUDP udp;
+   AsyncUDP udp;
 
-    bool initUnicast(uint16_t port);
-    // packet parser callback
-    void parsePacket(AsyncUDPPacket _packet);
-    
-    osc_bundle_callback_function _cbBundle = nullptr;
-    osc_message_callback_function _cbMessage = nullptr;
+  std::map<std::string, std::function<void(OSCMessage &)>> oscmap; // maps addresses to handlers
+
+  //std::map<std::string, callbackOSC_c> oscmap; // maps addresses to handlers
+
+   bool initUnicast(uint16_t port);
+   // packet parser callback
+   void parsePacket(AsyncUDPPacket _packet);
+
+   //osc_bundle_callback_function _cbBundle = nullptr;
+   //osc_message_callback_function _cbMessage = nullptr;
 
  public:
-    AsyncOSC(osc_bundle_callback_function cbb, osc_message_callback_function cbm);
+   AsyncOSC(); //osc_bundle_callback_function cbb, osc_message_callback_function cbm);
 
-    // Generic UDP listener, no physical or IP configuration
-    bool begin(uint16_t port = OSC_DEFAULT_PORT);
+   // Generic UDP listener, no physical or IP configuration
+   bool begin(uint16_t port = OSC_DEFAULT_PORT);
+
+   void handleOscMessage(OSCMessage &msg);
+   void handleOscBundle(OSCBundle &bndl);
+
+   std::function<void(OSCMessage &)> getHandlerForAddress(std::string addr);
+   void addHandlerForAddress(std::string addr, callbackOSC_c cb);
+//   void addHandlerForAddress(std::string addr, callbackOSC cb);
+   void addHandlerForAddress(std::string addr, std::function<void(OSCMessage &)> cb);
 };
 
 

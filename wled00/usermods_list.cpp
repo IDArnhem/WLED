@@ -138,9 +138,9 @@ void registerUsermods()
    */
   //usermods.add(new MyExampleUsermod());
 
-  #ifdef USERMOD_DAT_PHOTON
+  //#ifdef USERMOD_DAT_PHOTON
   usermods.add(new DatPhotonUsermod());
-  #endif
+  //#endif
 
   #ifdef USERMOD_BATTERY_STATUS_BASIC
   usermods.add(new UsermodBatteryBasic());

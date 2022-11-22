@@ -46,9 +46,22 @@ class DatPhotonUsermod : public Usermod {
      */
     void setup() {
       //Serial.println("Hello from my usermod!");
-      Serial.println("DAT (P()h)oton) plugin loaded...");
+      Serial.println("(!!!) DAT (P()h)oton) plugin loaded...");
+      //std::function<void(DatPhotonUsermod&)(OSCMessage &)> fn = &DatPhotonUsermod::on_one;
+      //auto fn = std::bind(&DatPhotonUsermod::on_one, this, std::placeholders::_1);
+      std::function<void(OSCMessage &)> fn = std::bind(&DatPhotonUsermod::on_one, this, std::placeholders::_1);
+      //callbackOSC_c fn = nullptr; //std::bind(&DatPhotonUsermod::on_one, this);
+      osc.addHandlerForAddress("/test/one", fn );
     }
 
+
+    void on_one(OSCMessage &msg) {
+      Serial.println(" DatPhoton /test/one << on_one called! ");
+    }
+
+    void on_two(OSCMessage &msg) {
+      Serial.println(" DatPhoton /test/two << on_two called! ");
+    }
 
     /*
      * connected() is called every time the WiFi is (re)connected

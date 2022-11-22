@@ -2,9 +2,9 @@
 #include "../network/Network.h"
 #include <string.h>
 
-AsyncOSC::AsyncOSC(osc_bundle_callback_function cbb, osc_message_callback_function cbm) {
-  _cbBundle = cbb;
-  _cbMessage = cbm;
+AsyncOSC::AsyncOSC() { //osc_bundle_callback_function cbb, osc_message_callback_function cbm) {
+  // _cbBundle = cbb;
+  // _cbMessage = cbm;
 }
 
 bool AsyncOSC::begin(uint16_t port) {
@@ -21,6 +21,44 @@ bool AsyncOSC::initUnicast(uint16_t port) {
     success = true;
   }
   return success;
+}
+
+void AsyncOSC::addHandlerForAddress(std::string addr, std::function<void(OSCMessage &)> cb) {
+    oscmap[addr] = cb;
+}
+
+std::function<void(OSCMessage &)> AsyncOSC::getHandlerForAddress(std::string addr)
+{
+    auto fun = oscmap.find(addr);
+    if(fun == oscmap.end()) { return nullptr; }
+    return fun->second;
+}
+
+
+void AsyncOSC::handleOscMessage(OSCMessage &msg) {
+    char baddr[255];
+    msg.getAddress(baddr);
+    std::string addr( baddr );
+
+    // callbackOSC handler = getHandlerForAddress( addr );
+    // tCallbackOSC_c cb = handler.target<void (*)(OSCMessage &)>();
+    //msg.dispatch(baddr, cb);
+
+    std::function<void(OSCMessage &)> handler = getHandlerForAddress( addr );
+    if( handler != nullptr) {
+      handler( msg );
+    } else {
+      Serial.print("AsyncOSC no match for >> ");
+      Serial.println( baddr );
+    }
+
+    //msg.dispatch(baddr, handler);
+}
+
+void AsyncOSC::handleOscBundle(OSCBundle &bndl) {
+    Serial.print("<-- OSC bundle received with ");
+    Serial.print( bndl.size() );
+    Serial.println(" messages");
 }
 
 void AsyncOSC::parsePacket(AsyncUDPPacket _packet) {
@@ -48,22 +86,14 @@ void AsyncOSC::parsePacket(AsyncUDPPacket _packet) {
       if( !inbndl.getError() ) {
         // recover from previous error
         error = false;
-        if( _cbBundle == nullptr ) {
-          Serial.print("[OSC] bundle callback not set ");
-        } else {
-          Serial.print("[OSC] calling bundle callback");
-          _cbBundle( inbndl );
-        }
+        Serial.println("[OSC] calling bundle callback");
+        handleOscBundle( inbndl );
       } // if no errors in bundle
     } // parse bundle
 
   } else {
-    if( _cbMessage == nullptr ) {
-      Serial.print("[OSC] message callback not set ");
-    } else {
-      Serial.print("[OSC] calling message callback");
-      _cbMessage( inmsg );
-    }
+    Serial.println("[OSC] calling message callback");
+    handleOscMessage( inmsg );
   }
 
   
@@ -72,6 +102,11 @@ void AsyncOSC::parsePacket(AsyncUDPPacket _packet) {
 //     protocol = P_DDP;
 //   }
 
+
+  if(error) {
+    Serial.print("[OSC] error ");
+    Serial.println( inmsg.getError() );
+  }
 
   // if (!error && (_callback != nullptr) ) {
   //   _callback( inmsg );

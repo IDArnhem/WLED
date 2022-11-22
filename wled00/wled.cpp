@@ -524,10 +524,7 @@ void WLED::initAP(bool resetAP)
     ddp.begin(false, DDP_DEFAULT_PORT);
 
     // @CUSTOM BEGIN
-    DEBUG_PRINT("Listening for OSC on port ");
-    DEBUG_PRINT(OSC_DEFAULT_PORT);
-    DEBUG_PRINTLN();
-    osc.begin();
+    osc.begin( OSC_DEFAULT_LISTEN_PORT );
     // @CUSTOM END
 
     dnsServer.setErrorReplyCode(DNSReplyCode::NoError);
@@ -736,10 +733,7 @@ void WLED::initInterfaces()
   initMqtt();
   
   // @CUSTOM BEGIN
-  DEBUG_PRINT("Listening for OSC on port ");
-  DEBUG_PRINT(OSC_DEFAULT_PORT);
-  DEBUG_PRINTLN();
-  osc.begin();
+  osc.begin( OSC_DEFAULT_LISTEN_PORT );
   // @CUSTOM END
 
   interfacesInited = true;

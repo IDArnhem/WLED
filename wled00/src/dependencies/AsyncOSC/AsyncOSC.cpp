@@ -8,6 +8,9 @@ AsyncOSC::AsyncOSC() { //osc_bundle_callback_function cbb, osc_message_callback_
 }
 
 bool AsyncOSC::begin(uint16_t port) {
+  Serial.print("[OSC] Listening on port ");
+  Serial.print( port );
+  Serial.println();
   return initUnicast(port);
 }
 
@@ -40,25 +43,28 @@ void AsyncOSC::handleOscMessage(OSCMessage &msg) {
     msg.getAddress(baddr);
     std::string addr( baddr );
 
-    // callbackOSC handler = getHandlerForAddress( addr );
-    // tCallbackOSC_c cb = handler.target<void (*)(OSCMessage &)>();
-    //msg.dispatch(baddr, cb);
-
     std::function<void(OSCMessage &)> handler = getHandlerForAddress( addr );
+    
     if( handler != nullptr) {
-      handler( msg );
+      
+      handler( msg ); // say your prayers
+
+      // @note we can't call the message dispatch method
+      // because we can't convert our C++-style handler to a void(OSCMessage &) C-style function pointer
+      // the dispatch method does some address verification that we don't do here and then calls the handler with
+      // the message as a parameter, whcih we do.
+      //msg.dispatch(baddr, handler);
     } else {
-      Serial.print("AsyncOSC no match for >> ");
+      Serial.print("[OSC] no handler for >> ");
       Serial.println( baddr );
     }
-
-    //msg.dispatch(baddr, handler);
 }
 
 void AsyncOSC::handleOscBundle(OSCBundle &bndl) {
-    Serial.print("<-- OSC bundle received with ");
-    Serial.print( bndl.size() );
-    Serial.println(" messages");
+  Serial.println("[OSC] BUNDLES NOT SUPPORTED YET");
+    // Serial.print("<-- OSC bundle received with ");
+    // Serial.print( bndl.size() );
+    // Serial.println(" messages");
 }
 
 void AsyncOSC::parsePacket(AsyncUDPPacket _packet) {
@@ -97,21 +103,27 @@ void AsyncOSC::parsePacket(AsyncUDPPacket _packet) {
   }
 
   
-//   if (error && _packet.localPort() == DDP_DEFAULT_PORT) { //DDP packet
-//     error = false;
-//     protocol = P_DDP;
-//   }
-
-
   if(error) {
     Serial.print("[OSC] error ");
     Serial.println( inmsg.getError() );
   }
+}
 
-  // if (!error && (_callback != nullptr) ) {
-  //   _callback( inmsg );
-  // } else {
-  //   Serial.print("[OSC] error ");
-  //   Serial.println( inmsg.getError() );
-  // }
+void AsyncOSC::broadcast( OSCMessage &msg ) {
+  // get broadcast IP address
+  IPAddress broadcastIp;
+  broadcastIp = ~uint32_t(Network.subnetMask()) | uint32_t(Network.gatewayIP());
+
+  AsyncUDPMessage outUDPMsg;
+  msg.send(outUDPMsg);
+
+  udp.sendTo(outUDPMsg, broadcastIp, OSC_DEFAULT_SEND_PORT);
+}
+
+void AsyncOSC::send( OSCMessage &msg, IPAddress & ip, int port) {
+  // see: https://gitlab.doc.gold.ac.uk/physical-computing/osc_huzzah32/-/blob/master/osc_huzzah32.ino
+  AsyncUDPMessage outUDPMsg;
+  msg.send(outUDPMsg);
+
+  udp.sendTo(outUDPMsg, ip, port);
 }

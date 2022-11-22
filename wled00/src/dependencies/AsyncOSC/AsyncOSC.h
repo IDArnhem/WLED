@@ -21,14 +21,11 @@
 
 
 // defaults
-#define OSC_DEFAULT_PORT   12345
-
-// new packet callback
-// typedef void (*osc_bundle_callback_function) (OSCBundle &bndl);
-// typedef void (*osc_message_callback_function) (OSCMessage &msg);
+#define OSC_DEFAULT_LISTEN_PORT   12345
+#define OSC_DEFAULT_SEND_PORT     54321
 
 
-typedef void (*callbackOSC_c)(OSCMessage &); // c-style callback
+//typedef void (*callbackOSC_c)(OSCMessage &); // c-style callback
 typedef std::function<void(OSCMessage &)> callbackOSC;
 //using callbackOSC = std::function<void(OSCMessage &)>; // c++ style callback
 
@@ -39,26 +36,24 @@ class AsyncOSC {
 
   std::map<std::string, std::function<void(OSCMessage &)>> oscmap; // maps addresses to handlers
 
-  //std::map<std::string, callbackOSC_c> oscmap; // maps addresses to handlers
-
    bool initUnicast(uint16_t port);
    // packet parser callback
    void parsePacket(AsyncUDPPacket _packet);
-
-   //osc_bundle_callback_function _cbBundle = nullptr;
-   //osc_message_callback_function _cbMessage = nullptr;
 
  public:
    AsyncOSC(); //osc_bundle_callback_function cbb, osc_message_callback_function cbm);
 
    // Generic UDP listener, no physical or IP configuration
-   bool begin(uint16_t port = OSC_DEFAULT_PORT);
+   bool begin(uint16_t port = OSC_DEFAULT_LISTEN_PORT);
+
+   void broadcast(OSCMessage &msg);
+   void send(OSCMessage &msg, IPAddress &ip, int port = OSC_DEFAULT_SEND_PORT);
 
    void handleOscMessage(OSCMessage &msg);
    void handleOscBundle(OSCBundle &bndl);
 
    std::function<void(OSCMessage &)> getHandlerForAddress(std::string addr);
-   void addHandlerForAddress(std::string addr, callbackOSC_c cb);
+//   void addHandlerForAddress(std::string addr, callbackOSC_c cb);
 //   void addHandlerForAddress(std::string addr, callbackOSC cb);
    void addHandlerForAddress(std::string addr, std::function<void(OSCMessage &)> cb);
 };

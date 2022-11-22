@@ -20,10 +20,9 @@
  * 2. Register the usermod by adding #include "usermod_filename.h" in the top and registerUsermod(new MyUsermodClass()) in the bottom of usermods_list.cpp
  */
 
-//class name. Use something descriptive and leave the ": public Usermod" part :)
 class DatPhotonUsermod : public Usermod {
   private:
-    //Private class members. You can declare variables and functions only accessible to your usermod here
+    unsigned long msHeartbeat = 5000;
     unsigned long lastTime = 0;
 
     // set your config variables to their boot default value (this can also be done in readFromConfig() or a constructor if you prefer)
@@ -45,22 +44,20 @@ class DatPhotonUsermod : public Usermod {
      * You can use it to initialize variables, sensors or similar.
      */
     void setup() {
-      //Serial.println("Hello from my usermod!");
-      Serial.println("(!!!) DAT (P()h)oton) plugin loaded...");
-      //std::function<void(DatPhotonUsermod&)(OSCMessage &)> fn = &DatPhotonUsermod::on_one;
-      //auto fn = std::bind(&DatPhotonUsermod::on_one, this, std::placeholders::_1);
+      Serial.println("[DAT] (P()h)oton) plugin loaded...");
+
+      // configure callbacks for OSC messages handled in this usermod
       std::function<void(OSCMessage &)> fn = std::bind(&DatPhotonUsermod::on_one, this, std::placeholders::_1);
-      //callbackOSC_c fn = nullptr; //std::bind(&DatPhotonUsermod::on_one, this);
       osc.addHandlerForAddress("/test/one", fn );
     }
 
 
     void on_one(OSCMessage &msg) {
-      Serial.println(" DatPhoton /test/one << on_one called! ");
+      Serial.println(" [DAT] /test/one << on_one called! ");
     }
 
     void on_two(OSCMessage &msg) {
-      Serial.println(" DatPhoton /test/two << on_two called! ");
+      Serial.println(" [DAT] /test/two << on_two called! ");
     }
 
     /*
@@ -72,6 +69,15 @@ class DatPhotonUsermod : public Usermod {
     }
 
 
+    void heartbeat() {
+      IPAddress dest(4, 3, 2, 2);
+
+      Serial.println(" [DAT] sending heartbeat...");
+      OSCMessage msg("/fixture/heartbeat");
+      osc.send( msg, dest, OSC_DEFAULT_SEND_PORT );
+    }
+
+    unsigned long elapsed(unsigned long ms) { return ((millis() - lastTime) > ms); }
     /*
      * loop() is called continuously. Here you can check for events, read sensors, etc.
      * 
@@ -83,10 +89,12 @@ class DatPhotonUsermod : public Usermod {
      *    Instead, use a timer check as shown here.
      */
     void loop() {
-      // if (millis() - lastTime > 1000) {
-      //   //Serial.println("I'm alive!");
-      //   lastTime = millis();
-      // }
+
+      if ( elapsed(msHeartbeat) ) {
+        heartbeat();
+        lastTime = millis();
+      }
+
     }
 
 

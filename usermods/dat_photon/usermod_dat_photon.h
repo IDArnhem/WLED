@@ -68,13 +68,14 @@ class DatPhotonUsermod : public Usermod {
       //Serial.println("Connected to WiFi!");
     }
 
-
     void heartbeat() {
-      IPAddress dest(4, 3, 2, 2);
+      //IPAddress dest(4, 3, 2, 2);
 
       Serial.println(" [DAT] sending heartbeat...");
       OSCMessage msg("/fixture/heartbeat");
-      osc.send( msg, dest, OSC_DEFAULT_SEND_PORT );
+      msg.add( escapedMac.c_str() );
+      //osc.send( msg, dest, OSC_DEFAULT_SEND_PORT );
+      osc.broadcast( msg );
     }
 
     unsigned long elapsed(unsigned long ms) { return ((millis() - lastTime) > ms); }

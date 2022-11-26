@@ -34,19 +34,20 @@ FastAccelStepper *stepper = NULL;
 
 class DatPhotonUsermod : public Usermod {
   private:
-    unsigned long msHeartbeat = 5000;
     unsigned long lastTime = 0;
 
     // set your config variables to their boot default value (this can also be done in readFromConfig() or a constructor if you prefer)
-    bool testBool = false;
-    unsigned long testULong = 42424242;
-    float testFloat = 42.42;
-    String testString = "Forty-Two";
+    bool sendHeartbeat = true;
+    unsigned long msHeartbeat = 5000;
+    
+    // unsigned long testULong = 42424242;
+    // float testFloat = 42.42;
+    // String testString = "Forty-Two";
 
-    // These config variables have defaults set inside readFromConfig()
-    int testInt;
-    long testLong;
-    int8_t testPins[2];
+    // // These config variables have defaults set inside readFromConfig()
+    // int testInt;
+    // long testLong;
+    // int8_t testPins[2];
 
   public:
 
@@ -142,7 +143,7 @@ class DatPhotonUsermod : public Usermod {
      */
     void loop() {
 
-      if ( elapsed(msHeartbeat) ) {
+      if ( elapsed(msHeartbeat) && sendHeartbeat ) {
         heartbeat();
         lastTime = millis();
       }
@@ -186,7 +187,7 @@ class DatPhotonUsermod : public Usermod {
      */
     void readFromJsonState(JsonObject& root)
     {
-      userVar0 = root["user0"] | userVar0; //if "user0" key exists in JSON, update, else keep old value
+      //userVar0 = root["user0"] | userVar0; //if "user0" key exists in JSON, update, else keep old value
       //if (root["bri"] == 255) Serial.println(F("Don't burn down your garage!"));
     }
 
@@ -228,17 +229,18 @@ class DatPhotonUsermod : public Usermod {
      */
     void addToConfig(JsonObject& root)
     {
-      JsonObject top = root.createNestedObject("exampleUsermod");
-      top["great"] = userVar0; //save these vars persistently whenever settings are saved
-      top["testBool"] = testBool;
-      top["testInt"] = testInt;
-      top["testLong"] = testLong;
-      top["testULong"] = testULong;
-      top["testFloat"] = testFloat;
-      top["testString"] = testString;
-      JsonArray pinArray = top.createNestedArray("pin");
-      pinArray.add(testPins[0]);
-      pinArray.add(testPins[1]); 
+      JsonObject top = root.createNestedObject("LUMOKINETIX");
+      //top["great"] = userVar0; //save these vars persistently whenever settings are saved
+      top["sendHeartbeat"] = sendHeartbeat;
+      top["msHeartbeat"] = msHeartbeat;
+      // top["testInt"] = testInt;
+      // top["testLong"] = testLong;
+      // top["testULong"] = testULong;
+      // top["testFloat"] = testFloat;
+      // top["testString"] = testString;
+      // JsonArray pinArray = top.createNestedArray("pin");
+      // pinArray.add(testPins[0]);
+      // pinArray.add(testPins[1]); 
     }
 
 
@@ -262,21 +264,21 @@ class DatPhotonUsermod : public Usermod {
       // default settings values could be set here (or below using the 3-argument getJsonValue()) instead of in the class definition or constructor
       // setting them inside readFromConfig() is slightly more robust, handling the rare but plausible use case of single value being missing after boot (e.g. if the cfg.json was manually edited and a value was removed)
 
-      JsonObject top = root["exampleUsermod"];
+      JsonObject top = root["LUMOKINETIX"];
 
       bool configComplete = !top.isNull();
 
-      configComplete &= getJsonValue(top["great"], userVar0);
-      configComplete &= getJsonValue(top["testBool"], testBool);
-      configComplete &= getJsonValue(top["testULong"], testULong);
-      configComplete &= getJsonValue(top["testFloat"], testFloat);
-      configComplete &= getJsonValue(top["testString"], testString);
+      //configComplete &= getJsonValue(top["great"], userVar0);
+      configComplete &= getJsonValue(top["sendHeartbeat"], sendHeartbeat);
+      configComplete &= getJsonValue(top["msHeartbeat"], msHeartbeat);
+      // configComplete &= getJsonValue(top["testFloat"], testFloat);
+      // configComplete &= getJsonValue(top["testString"], testString);
 
-      // A 3-argument getJsonValue() assigns the 3rd argument as a default value if the Json value is missing
-      configComplete &= getJsonValue(top["testInt"], testInt, 42);  
-      configComplete &= getJsonValue(top["testLong"], testLong, -42424242);
-      configComplete &= getJsonValue(top["pin"][0], testPins[0], -1);
-      configComplete &= getJsonValue(top["pin"][1], testPins[1], -1);
+      // // A 3-argument getJsonValue() assigns the 3rd argument as a default value if the Json value is missing
+      // configComplete &= getJsonValue(top["testInt"], testInt, 42);  
+      // configComplete &= getJsonValue(top["testLong"], testLong, -42424242);
+      // configComplete &= getJsonValue(top["pin"][0], testPins[0], -1);
+      // configComplete &= getJsonValue(top["pin"][1], testPins[1], -1);
 
       return configComplete;
     }

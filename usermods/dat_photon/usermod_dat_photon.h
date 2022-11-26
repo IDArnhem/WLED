@@ -1,6 +1,18 @@
 #pragma once
 
 #include "wled.h"
+#include <FastAccelStepper.h>
+
+#define STEP_PIN 2
+#define DIR_PIN 4
+#define FAULT_PIN 35
+#define STEPPER_ENABLE 14
+
+int microStep = 32;
+const int stepsPerRevolution = 200*microStep;
+
+FastAccelStepperEngine engine = FastAccelStepperEngine();
+FastAccelStepper *stepper = NULL;
 
 /*
  * Usermods allow you to add own functionality to WLED more easily
@@ -37,27 +49,66 @@ class DatPhotonUsermod : public Usermod {
     int8_t testPins[2];
 
   public:
-    //Functions called by WLED
 
-    /*
-     * setup() is called once at boot. WiFi is not yet connected at this point.
-     * You can use it to initialize variables, sensors or similar.
-     */
+    void setupOscHandlers() {
+      // configure callbacks for OSC messages handled in this usermod
+      std::function<void(OSCMessage &)> fn1 = std::bind(&DatPhotonUsermod::on_one, this, std::placeholders::_1);
+      osc.addHandlerForAddress("/test/one", fn1 );
+
+      std::function<void(OSCMessage &)> fn2 = std::bind(&DatPhotonUsermod::on_two, this, std::placeholders::_1);
+      osc.addHandlerForAddress("/test/two", fn2 );
+    }
+
+    void setupStepper() {
+      //setting microstepping to 32
+      digitalWrite(STEPPER_ENABLE, HIGH);
+      pinMode(STEP_PIN, OUTPUT);
+      pinMode(DIR_PIN, OUTPUT);
+      digitalWrite(STEP_PIN, LOW);
+      digitalWrite(DIR_PIN, LOW);
+      pinMode(FAULT_PIN, INPUT_PULLUP);
+      pinMode(STEPPER_ENABLE, OUTPUT);
+      digitalWrite(STEPPER_ENABLE, LOW);
+
+
+      engine.init();
+      stepper = engine.stepperConnectToPin(STEP_PIN);
+      if (stepper) {
+        stepper->setDirectionPin(DIR_PIN);
+        stepper->setEnablePin(STEPPER_ENABLE);
+        stepper->setAutoEnable(true);
+
+        // If auto enable/disable need delays, just add (one or both):
+        // stepper->setDelayToEnable(50);
+        // stepper->setDelayToDisable(1000);
+
+        stepper->setSpeedInUs(50);  // the parameter is us/step !!!
+        stepper->setAcceleration(4000);
+      }
+    } // setupStepper
+
     void setup() {
       Serial.println("[DAT] (P()h)oton) plugin loaded...");
 
-      // configure callbacks for OSC messages handled in this usermod
-      std::function<void(OSCMessage &)> fn = std::bind(&DatPhotonUsermod::on_one, this, std::placeholders::_1);
-      osc.addHandlerForAddress("/test/one", fn );
+      setupOscHandlers();
+      setupStepper();
     }
 
 
     void on_one(OSCMessage &msg) {
       Serial.println(" [DAT] /test/one << on_one called! ");
+      int range = stepsPerRevolution / 4;
+      int a = random(-range, range);
+
+      stepper->move(a);
     }
 
     void on_two(OSCMessage &msg) {
       Serial.println(" [DAT] /test/two << on_two called! ");
+      int range = stepsPerRevolution;
+      int a = random(-range, range);
+
+      stepper->move(a);
     }
 
     /*

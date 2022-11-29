@@ -620,6 +620,7 @@ WLED_GLOBAL WiFiUDP notifierUdp, rgbUdp, notifier2Udp;
 WLED_GLOBAL WiFiUDP ntpUdp;
 WLED_GLOBAL ESPAsyncE131 e131 _INIT_N(((handleE131Packet)));
 WLED_GLOBAL ESPAsyncE131 ddp  _INIT_N(((handleE131Packet)));
+// @CUSTOM
 WLED_GLOBAL AsyncOSC osc;      //_INIT(NULL); //_INIT_N(((handleOscBundle, handleOscMessage))); 
 WLED_GLOBAL bool e131NewData _INIT(false);
 

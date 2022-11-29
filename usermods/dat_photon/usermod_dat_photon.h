@@ -14,24 +14,17 @@ const int stepsPerRevolution = 200*microStep;
 FastAccelStepperEngine engine = FastAccelStepperEngine();
 FastAccelStepper *stepper = NULL;
 
-/*
- * Usermods allow you to add own functionality to WLED more easily
- * See: https://github.com/Aircoookie/WLED/wiki/Add-own-functionality
- * 
- * This is an example for a v2 usermod.
- * v2 usermods are class inheritance based and can (but don't have to) implement more functions, each of them is shown in this example.
- * Multiple v2 usermods can be added to one compilation easily.
- * 
- * Creating a usermod:
- * This file serves as an example. If you want to create a usermod, it is recommended to use usermod_v2_empty.h from the usermods folder as a template.
- * Please remember to rename the class and file to a descriptive name.
- * You may also use multiple .h and .cpp files.
- * 
- * Using a usermod:
- * 1. Copy the usermod into the sketch folder (same folder as wled00.ino)
- * 2. Register the usermod by adding #include "usermod_filename.h" in the top and registerUsermod(new MyUsermodClass()) in the bottom of usermods_list.cpp
- */
-
+// ////////////////////////////////////////////////////////////////////////////
+//  ▄▄▄▄▄▄  ▄▄▄▄▄▄▄ ▄▄▄▄▄▄▄ 
+// █      ██       █       █
+// █  ▄    █   ▄   █▄     ▄█
+// █ █ █   █  █▄█  █ █   █  
+// █ █▄█   █       █ █   █  
+// █       █   ▄   █ █   █  
+// █▄▄▄▄▄▄██▄▄█ █▄▄█ █▄▄▄█  
+//
+// |l u m o k i n e t i x|
+// ////////////////////////////////////////////////////////////////////////////
 class DatPhotonUsermod : public Usermod {
   private:
     unsigned long lastTime = 0;

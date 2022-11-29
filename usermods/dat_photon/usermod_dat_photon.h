@@ -51,13 +51,22 @@ class DatPhotonUsermod : public Usermod {
 
   public:
 
+/*
+bundle.dispatch("/moveto", on_moveto);
+bundle.dispatch("/spin", on_spin);
+bundle.dispatch("/stop", on_stop);
+bundle.dispatch("/set_accel", on_set_accel);
+bundle.dispatch("/set_speed", on_set_speed);
+bundle.dispatch("/set_dir", on_set_dir);
+*/
+
     void setupOscHandlers() {
       // configure callbacks for OSC messages handled in this usermod
-      std::function<void(OSCMessage &)> fn1 = std::bind(&DatPhotonUsermod::on_one, this, std::placeholders::_1);
-      osc.addHandlerForAddress("/test/one", fn1 );
+      std::function<void(OSCMessage &)> fn1 = std::bind(&DatPhotonUsermod::on_move, this, std::placeholders::_1);
+      osc.addHandlerForAddress("/motor/move", fn1 );
 
-      std::function<void(OSCMessage &)> fn2 = std::bind(&DatPhotonUsermod::on_two, this, std::placeholders::_1);
-      osc.addHandlerForAddress("/test/two", fn2 );
+      std::function<void(OSCMessage &)> fn2 = std::bind(&DatPhotonUsermod::on_set_speed, this, std::placeholders::_1);
+      osc.addHandlerForAddress("/motor/set_speed", fn2 );
     }
 
     void setupStepper() {
@@ -96,20 +105,44 @@ class DatPhotonUsermod : public Usermod {
     }
 
 
-    void on_one(OSCMessage &msg) {
-      Serial.println(" [DAT] /test/one << on_one called! ");
-      int range = stepsPerRevolution / 4;
-      int a = random(-range, range);
+    void on_move(OSCMessage &msg) {
+      // int range = stepsPerRevolution / 4;
+      // int a = random(-range, range);
 
-      stepper->move(a);
+      int pos;
+
+      if( msg.isInt(0) ) {
+        pos = msg.getInt(0);
+      } else {
+        pos = floor(msg.getFloat(0));
+      }
+
+      Serial.print(" [DAT] /motor/move ");
+      Serial.print( pos );
+      Serial.println();
+
+      stepper->move( pos );
     }
 
-    void on_two(OSCMessage &msg) {
-      Serial.println(" [DAT] /test/two << on_two called! ");
-      int range = stepsPerRevolution;
-      int a = random(-range, range);
+    void on_set_speed(OSCMessage &msg) {
+      Serial.println(" [DAT] /motor/set_speed called! ");
+      // int range = stepsPerRevolution;
+      // int a = random(-range, range);
 
-      stepper->move(a);
+      int vel;
+
+      if( msg.isInt(0) ) {
+        vel = msg.getInt(0);
+      } else {
+        vel = floor(msg.getFloat(0));
+      }
+
+      Serial.print(" [DAT] /motor/set_speed ");
+      Serial.print( vel );
+      Serial.println();
+
+      stepper->setSpeedInUs( vel );
+      // stepper->move(a);
     }
 
     /*
@@ -121,12 +154,13 @@ class DatPhotonUsermod : public Usermod {
     }
 
     void heartbeat() {
-      //IPAddress dest(4, 3, 2, 2);
-
-      Serial.println(" [DAT] sending heartbeat...");
+      //Serial.println(" [DAT] sending heartbeat...");
       OSCMessage msg("/fixture/heartbeat");
-      msg.add( escapedMac.c_str() );
-      //osc.send( msg, dest, OSC_DEFAULT_SEND_PORT );
+      msg.add( escapedMac.c_str() );        // unique identifier for fixture
+      msg.add( strip.getLengthTotal() );    // length of strip in pixels?
+      msg.add( e131Universe );              // DMX universe
+      msg.add( DMXAddress );                // starting DMX channel
+      // dispatch message to broadcast address
       osc.broadcast( msg );
     }
 

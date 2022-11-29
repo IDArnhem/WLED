@@ -93,7 +93,7 @@ bundle.dispatch("/set_dir", on_set_dir);
         // stepper->setDelayToDisable(1000);
 
         stepper->setSpeedInUs(50);  // the parameter is us/step !!!
-        stepper->setAcceleration(4000);
+        stepper->setAcceleration(5000);
       }
     } // setupStepper
 
@@ -125,7 +125,6 @@ bundle.dispatch("/set_dir", on_set_dir);
     }
 
     void on_set_speed(OSCMessage &msg) {
-      Serial.println(" [DAT] /motor/set_speed called! ");
       // int range = stepsPerRevolution;
       // int a = random(-range, range);
 

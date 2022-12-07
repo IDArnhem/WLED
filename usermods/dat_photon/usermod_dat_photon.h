@@ -62,6 +62,18 @@ bundle.dispatch("/set_dir", on_set_dir);
 
       std::function<void(OSCMessage &)> fn2 = std::bind(&DatPhotonUsermod::on_set_speed, this, std::placeholders::_1);
       osc.addHandlerForAddress("/motor/set_speed", fn2 );
+
+      std::function<void(OSCMessage &)> fn3 = std::bind(&DatPhotonUsermod::on_stop, this, std::placeholders::_1);
+      osc.addHandlerForAddress("/motor/stop", fn3 );      
+
+      std::function<void(OSCMessage &)> fn4 = std::bind(&DatPhotonUsermod::on_set_accel, this, std::placeholders::_1);
+      osc.addHandlerForAddress("/motor/set_accel", fn4 );
+
+      std::function<void(OSCMessage &)> fn5 = std::bind(&DatPhotonUsermod::on_spin, this, std::placeholders::_1);
+      osc.addHandlerForAddress("/motor/spin", fn5 );
+
+      std::function<void(OSCMessage &)> fn6 = std::bind(&DatPhotonUsermod::on_set_dir, this, std::placeholders::_1);
+      osc.addHandlerForAddress("/motor/set_dir", fn6 );
     }
 
     void setupStepper() {
@@ -74,7 +86,14 @@ bundle.dispatch("/set_dir", on_set_dir);
       pinMode(FAULT_PIN, INPUT_PULLUP);
       pinMode(STEPPER_ENABLE, OUTPUT);
       digitalWrite(STEPPER_ENABLE, LOW);
-
+      digitalWrite(STEPPER_ENABLE, LOW);
+ 
+     for(int i = 0; i<6400; i++){
+        digitalWrite(STEP_PIN, HIGH);
+        delay(1);
+        digitalWrite(STEP_PIN, LOW);
+        delay(1);
+      }
 
       engine.init();
       stepper = engine.stepperConnectToPin(STEP_PIN);
@@ -89,7 +108,10 @@ bundle.dispatch("/set_dir", on_set_dir);
 
         stepper->setSpeedInUs(50);  // the parameter is us/step !!!
         stepper->setAcceleration(5000);
+        
       }
+      // 
+
     } // setupStepper
 
     void setup() {

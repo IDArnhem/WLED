@@ -32,6 +32,8 @@ class DatPhotonUsermod : public Usermod {
     // set your config variables to their boot default value (this can also be done in readFromConfig() or a constructor if you prefer)
     bool sendHeartbeat = true;
     unsigned long msHeartbeat = 5000;
+    int currentAccel = 50;
+    int currentSpeed = 100;
     
     // unsigned long testULong = 42424242;
     // float testFloat = 42.42;
@@ -97,8 +99,32 @@ bundle.dispatch("/set_dir", on_set_dir);
       setupStepper();
     }
 
+    void on_stop(OSCMessage &msg) {
 
-    void on_move(OSCMessage &msg) {
+      // @TODO here is where I have to put the code, to move the stepper to the given position
+      stepper->setSpeedInUs( 0 );
+      Serial.println(" [DAT] /motor/stop ");
+    }
+
+    void on_set_accel(OSCMessage &msg) {
+      int setAcc;
+
+      if( msg.isInt(0) ) {
+        setAcc = msg.getInt(0);
+      } else {
+        setAcc = floor(msg.getFloat(0));
+      }
+
+      Serial.println(" [DAT] /motor/set_accel ");
+      Serial.print( setAcc );
+      Serial.println();
+
+      currentAccel = setAcc;
+      // @TODO here is where I have to put the code, to move the stepper to the given position
+      stepper->setAcceleration( currentAccel );
+    }
+
+    void on_move(OSCMessage &msg) {  
       // int range = stepsPerRevolution / 4;
       // int a = random(-range, range);
 
@@ -117,6 +143,44 @@ bundle.dispatch("/set_dir", on_set_dir);
       stepper->move( pos );
     }
 
+    void on_moveto(OSCMessage &msg) {
+      int pos;
+
+      if( msg.isInt(0) ) {
+       pos = msg.getInt(0);
+      } else {
+        pos = floor(msg.getFloat(0));
+      }
+
+      Serial.println(" [DAT] /motor/moveto ");
+      Serial.print( pos );
+      
+      stepper->moveTo(pos);
+     //stepper.moveTo( random(0, 360) );
+      stepper->setSpeedInUs( currentSpeed );
+      stepper->setAcceleration( currentAccel );
+    }
+
+    void on_spin(OSCMessage &msg) {
+      int speed, direction;
+    
+      if( msg.isInt(0) && msg.isInt(1) ) {
+        speed = msg.getInt(0);
+        direction = msg.getInt(1);
+      } else {
+        speed = floor(msg.getFloat(0));
+        direction = floor(msg.getFloat(1));
+      }
+
+      Serial.print( speed );
+      Serial.print( ", " );
+      Serial.print( direction );
+      Serial.println(" [DAT] /motor/spin ");
+
+     stepper->setSpeedInUs( speed );
+      //direction depends on wheter the value is under/above 0 
+    }
+
     void on_set_speed(OSCMessage &msg) {
       // int range = stepsPerRevolution;
       // int a = random(-range, range);
@@ -133,9 +197,29 @@ bundle.dispatch("/set_dir", on_set_dir);
       Serial.print( vel );
       Serial.println();
 
-      stepper->setSpeedInUs( vel );
+      currentSpeed = vel;
+
+      stepper->setSpeedInUs( currentSpeed );
       // stepper->move(a);
     }
+
+    void on_set_dir(OSCMessage &msg) {
+      int dir;
+      Serial.println(" [DAT] /motor/set_dir ");
+
+      if( msg.isInt(0) ) {
+      dir = msg.getInt(0);
+      } else {
+      dir = floor(msg.getFloat(0));
+      }
+
+      Serial.print( dir );
+      Serial.println(" [DAT] /motor/set_dir ");
+
+      currentSpeed *= -1;
+    }
+
+
 
     /*
      * connected() is called every time the WiFi is (re)connected

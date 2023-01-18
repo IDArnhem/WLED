@@ -21,9 +21,9 @@ This is the OSC message map for the motor driver:
 
 | OSC | param | description |
 |---|---|---|
-| /motor/move | *steps* | move motor <steps> |
-| /motor/set_speed | *speed* | set speed of motion |
+| /motor/move | int *steps* | move motor <steps> |
+| /motor/set_speed | int *speed* | set speed of motion |
 | /motor/stop | n.a. | sets speed to zero |
-| /motor/set_accel | *steps per second* | set acceleration of easing function |
+| /motor/set_accel | int *steps per second* | set acceleration of easing function |
 | /motor/spin | n.a. | spin motor continuously |
 | /motor/set_dir | | not implemented |

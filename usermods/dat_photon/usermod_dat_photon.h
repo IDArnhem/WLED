@@ -87,13 +87,14 @@ bundle.dispatch("/set_dir", on_set_dir);
       pinMode(STEPPER_ENABLE, OUTPUT);
       digitalWrite(STEPPER_ENABLE, LOW);
       digitalWrite(STEPPER_ENABLE, LOW);
- 
-     for(int i = 0; i<6400; i++){
-        digitalWrite(STEP_PIN, HIGH);
-        delay(1);
-        digitalWrite(STEP_PIN, LOW);
-        delay(1);
-      }
+
+      // // jelle's test code for a full revolution 360
+      // for(int i = 0; i<6400; i++){
+      //   digitalWrite(STEP_PIN, HIGH);
+      //   delay(1);
+      //   digitalWrite(STEP_PIN, LOW);
+      //   delay(1);
+      // }
 
       engine.init();
       stepper = engine.stepperConnectToPin(STEP_PIN);
@@ -106,12 +107,15 @@ bundle.dispatch("/set_dir", on_set_dir);
         // stepper->setDelayToEnable(50);
         // stepper->setDelayToDisable(1000);
 
-        stepper->setSpeedInUs(50);  // the parameter is us/step !!!
+        stepper->setSpeedInUs(20);  // the parameter is us/step !!!
         stepper->setAcceleration(5000);
-        
       }
-      // 
 
+      stepper->move(3200);
+      delay(50);
+      stepper->move(-3200);
+      delay(50);
+      stepper->move(3200);
     } // setupStepper
 
     void setup() {

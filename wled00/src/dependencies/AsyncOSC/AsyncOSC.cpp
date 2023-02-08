@@ -8,9 +8,6 @@ AsyncOSC::AsyncOSC() { //osc_bundle_callback_function cbb, osc_message_callback_
 }
 
 bool AsyncOSC::begin(uint16_t port) {
-  Serial.print("[OSC] Listening on port ");
-  Serial.print( port );
-  Serial.println();
   return initUnicast(port);
 }
 
@@ -20,6 +17,9 @@ bool AsyncOSC::initUnicast(uint16_t port) {
   Serial.println("[OSC] unicast init");
 
   if (udp.listen(port)) {
+    Serial.print("[OSC] Listening on port ");
+    Serial.print( port );
+    Serial.println();
     udp.onPacket(std::bind(&AsyncOSC::parsePacket, this, std::placeholders::_1));
     success = true;
   }

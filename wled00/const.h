@@ -78,6 +78,8 @@
 #define USERMOD_ID_SI7021_MQTT_HA        29     //Usermod "usermod_si7021_mqtt_ha.h"
 #define USERMOD_ID_BME280                30     //Usermod "usermod_bme280.h
 #define USERMOD_ID_DAT_PHOTON            6066
+#define USERMOD_ID_DAT_HEARTBEAT         6067
+#define USERMOD_ID_MURGIA                6068
 
 
 //Access point behavior

@@ -11,6 +11,9 @@
  */
 
 #include "../usermods/dat_photon/usermod_dat_photon.h"
+#include "../usermods/dat_heartbeat/usermod_dat_heartbeat.h"
+
+#include "../usermods/murgia/usermod_murgia.h"
 
 #ifdef USERMOD_BATTERY_STATUS_BASIC
 #include "../usermods/battery_status_basic/usermod_v2_battery_status_basic.h"
@@ -141,6 +144,10 @@ void registerUsermods()
   //#ifdef USERMOD_DAT_PHOTON
   usermods.add(new DatPhotonUsermod());
   //#endif
+
+  usermods.add(new DatHeartbeatUsermod());
+
+  usermods.add(new  MurgiaUsermod());
 
   #ifdef USERMOD_BATTERY_STATUS_BASIC
   usermods.add(new UsermodBatteryBasic());

@@ -58,6 +58,9 @@ class DatPhotonUsermod : public Usermod {
 
       std::function<void(OSCMessage &)> fn6 = std::bind(&DatPhotonUsermod::on_set_dir, this, std::placeholders::_1);
       osc.addHandlerForAddress("/motor/set_dir", fn6 );
+
+      std::function<void(OSCMessage &)> fn7 = std::bind(&DatPhotonUsermod::on_move_to, this, std::placeholders::_1);
+      osc.addHandlerForAddress("/motor/move_to", fn7 );
     }
 
     void setupStepper() {
@@ -157,7 +160,7 @@ class DatPhotonUsermod : public Usermod {
       stepper->move( pos );
     }
 
-    void on_moveto(OSCMessage &msg) {
+    void on_move_to(OSCMessage &msg) {
       int pos;
 
       if( msg.isInt(0) ) {
@@ -166,7 +169,7 @@ class DatPhotonUsermod : public Usermod {
         pos = floor(msg.getFloat(0));
       }
 
-      Serial.println(" [DAT] /motor/moveto ");
+      Serial.println(" [DAT] /motor/move_to ");
       Serial.print( pos );
       
       stepper->setSpeedInHz( currentSpeed );
@@ -185,6 +188,9 @@ class DatPhotonUsermod : public Usermod {
         direction = floor(msg.getFloat(1));
       }
 
+      currentDirection = direction;
+      currentSpeed = speed;
+
       Serial.print( speed );
       Serial.print( ", " );
       Serial.print( direction );
@@ -192,8 +198,6 @@ class DatPhotonUsermod : public Usermod {
 
       stepper->setSpeedInHz( currentSpeed );
       stepper->setAcceleration( currentAccel );
-
-      currentDirection = direction;
 
       //direction depends on wheter the value is under/above 0 
       if(direction > 0) {

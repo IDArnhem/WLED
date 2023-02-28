@@ -137,6 +137,7 @@ class DatPhotonUsermod : public Usermod {
 
       currentAccel = setAcc;
       stepper->setAcceleration( currentAccel );
+      stepper->applySpeedAcceleration();
     }
 
     void on_move(OSCMessage &msg) {  
@@ -157,6 +158,7 @@ class DatPhotonUsermod : public Usermod {
 
       stepper->setSpeedInHz( currentSpeed );
       stepper->setAcceleration( currentAccel );
+      stepper->applySpeedAcceleration();
       stepper->move( pos );
     }
 
@@ -174,6 +176,7 @@ class DatPhotonUsermod : public Usermod {
       
       stepper->setSpeedInHz( currentSpeed );
       stepper->setAcceleration( currentAccel );
+      stepper->applySpeedAcceleration();
       stepper->moveTo(pos);
     }
 
@@ -198,6 +201,7 @@ class DatPhotonUsermod : public Usermod {
 
       stepper->setSpeedInHz( currentSpeed );
       stepper->setAcceleration( currentAccel );
+      stepper->applySpeedAcceleration();
 
       //direction depends on wheter the value is under/above 0 
       if(direction > 0) {
@@ -223,6 +227,7 @@ class DatPhotonUsermod : public Usermod {
       currentSpeed = vel;
 
       stepper->setSpeedInHz( currentSpeed );
+      stepper->applySpeedAcceleration();
     }
 
     void on_set_dir(OSCMessage &msg) {

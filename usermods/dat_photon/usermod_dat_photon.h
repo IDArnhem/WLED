@@ -8,6 +8,10 @@
 #define FAULT_PIN 35
 #define STEPPER_ENABLE 14
 
+#define SPEED_CAP 3200
+#define ACCEL_CAP 640
+
+
 int microStep = 32;
 const int stepsPerRevolution = 200*microStep;
 
@@ -75,7 +79,7 @@ class DatPhotonUsermod : public Usermod {
       digitalWrite(STEPPER_ENABLE, LOW);
       digitalWrite(STEPPER_ENABLE, LOW);
 
-      // // jelle's test code for a full revolution 360
+      // jelle's test code for a full revolution 360
       // for(int i = 0; i<6400; i++){
       //   digitalWrite(STEP_PIN, HIGH);
       //   delay(1);
@@ -98,16 +102,16 @@ class DatPhotonUsermod : public Usermod {
         // stepper->setAcceleration(5000);
 
         stepper->setSpeedInHz( 6400 ); // steps/s
-        stepper->setAcceleration( 500 );
+        stepper->setAcceleration( 100 );
       }
 
-      int stepsHalfTurn = stepsPerRevolution / 2;
+      // int stepsHalfTurn = stepsPerRevolution / 2;
 
-      stepper->move(stepsHalfTurn);
-      delay(50);
-      stepper->move(-stepsHalfTurn);
-      delay(50);
-      stepper->move(stepsHalfTurn);
+      stepper->move(stepsPerRevolution);
+      // delay(50);
+      // stepper->move(-stepsHalfTurn);
+      // delay(50);
+      // stepper->move(stepsHalfTurn);
     } // setupStepper
 
     void setup() {
